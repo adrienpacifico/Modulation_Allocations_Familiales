@@ -1,0 +1,14 @@
+*~
+*.egg-info
+*.mo
+*.pyc
+*.pyo
+.pydevproject
+.spyderproject
+/.coverage
+/.project
+/.settings
+/build
+/cover
+/dist
+/tags
