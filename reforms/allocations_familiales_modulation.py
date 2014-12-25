@@ -49,33 +49,32 @@ class allocations_familiales(formulas.SimpleFormulaColumn):
 
         af = simulation.calculate('af', period)
         plafond1 = params.plafond1 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
+#        print ("plafond1 = ", plafond1)
         plafond2 = params.plafond2 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
-
-#        print(plafond1)
-
         new_af = (
             (br_pf <= plafond1) * af +
             (br_pf > plafond1) * (br_pf < plafond2) * af / params.diviseur_plafond_1 +
             (br_pf > params.plafond2) * af / params.diviseur_plafond_2
             )
-        print ("br_pf", br_pf)
+#        print ("br_pf", br_pf)
         print("new_af", new_af)
 
         modulation_af = (
             (br_pf <= plafond1) * (af + br_pf) +
             (
-                (br_pf > params.plafond1) * (br_pf < params.plafond2) *
+                (br_pf > plafond1) * (br_pf <= plafond2) *
                 max_(
-                     params.plafond1 + af,
+                     plafond1 + af,
                      br_pf  + new_af
                      )
                 ) +
-            (br_pf > params.plafond2) *
+            (br_pf > plafond2) *
             max_(
-                af / params.diviseur_plafond_1 +  params.plafond2,
+                af / params.diviseur_plafond_1 + plafond2,
                 br_pf + new_af
                 )
             ) - br_pf
+        print ("modulation_af", modulation_af)
         return period, modulation_af
 
 
