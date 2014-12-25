@@ -25,17 +25,16 @@
 
 import datetime
 
-from nose.tools import assert_less
 
-from openfisca_france.reforms import allocations_familiales_modulation
+from modulation_allocations_familiales.reforms import allocations_familiales_modulation
 from openfisca_france.tests import base
 
 
-def test_modulations_allocations_familiales_2gosses(age_Parents = 40, age_enf1 = 9, age_enf2 = 9):
+def test_modulations_allocations_familiales_2gosses(age_parents = 40, age_enf1 = 9, age_enf2 = 9):
     year = 2014
     reform = allocations_familiales_modulation.build_reform(base.tax_benefit_system)
     impact = 0
-    for i in [0,1,2,3]:
+    for i in [0, 1, 2, 3]:
         scenario = reform.new_scenario().init_single_entity(
             axes = [
                 dict(
@@ -71,34 +70,8 @@ def test_modulations_allocations_familiales_2gosses(age_Parents = 40, age_enf1 =
         print("final", reform_simulation.calculate("allocations_familiales"))
 
 
-
-
-#    error_margin = 0.01
-#
-#    rfr = reference_simulation.calculate('rfr')
-#    expected_rfr = [13247, 13338, 13429, 13520, 13611, 13703, 13793, 13884, 13975, 14066]
-#    assert_less(max(abs(expected_rfr - rfr)), error_margin)
-#
-#    impo = reference_simulation.calculate('impo')
-#    expected_impo = [-249.11, -268.22, -287.33, -306.44, -325.55, -344.87, -363.77, -382.88, -401.99, -421.1]
-#    assert_less(max(abs(expected_impo - impo)), error_margin)
-#
-#    reform_simulation = scenario.new_simulation(debug = True)
-#    reform_reduction_impot_exceptionnelle = reform_simulation.calculate('reduction_impot_exceptionnelle')
-#    expected_reform_reduction_impot_exceptionnelle = [350, 350, 350, 350, 350, 350, 350, 261, 170, 79]
-#    assert_less(max(abs(expected_reform_reduction_impot_exceptionnelle - reform_reduction_impot_exceptionnelle)),
-#        error_margin)
-#
-#    reform_rfr = reform_simulation.calculate('rfr')
-#    assert_less(max(abs(expected_rfr - reform_rfr)), error_margin)  # rfr must be the same than before reform
-#
-#    reform_impo = reform_simulation.calculate('impo')
-#    expected_reform_impo = [0, 0, 0, 0, 0, 0, 0, -121.88, -231.99, -342.1]
-#    assert_less(max(abs(expected_reform_impo - reform_impo)), error_margin)
-
-
 if __name__ == '__main__':
     import logging
     import sys
     logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
-    test_modulations_allocations_familiales_2gosses(40,16,16)
+    test_modulations_allocations_familiales_2gosses(40, 16, 16)

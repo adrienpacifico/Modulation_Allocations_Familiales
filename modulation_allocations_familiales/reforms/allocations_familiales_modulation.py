@@ -30,7 +30,7 @@ import copy
 from numpy import maximum as max_
 from openfisca_core import columns, formulas, reforms
 
-from .. import entities
+from openfisca_france import entities
 
 
 # Reform formulas
@@ -49,24 +49,17 @@ class allocations_familiales(formulas.SimpleFormulaColumn):
 
         af = simulation.calculate('af', period)
         plafond1 = params.plafond1 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
-#        print ("plafond1 = ", plafond1)
         plafond2 = params.plafond2 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
         new_af = (
             (br_pf <= plafond1) * af +
             (br_pf > plafond1) * (br_pf < plafond2) * af / params.diviseur_plafond_1 +
             (br_pf > params.plafond2) * af / params.diviseur_plafond_2
             )
-#        print ("br_pf", br_pf)
-        print("new_af", new_af)
 
         modulation_af = (
-            (br_pf <= plafond1) * (af + br_pf) +
-            (
+            (br_pf <= plafond1) * (af + br_pf) + (
                 (br_pf > plafond1) * (br_pf <= plafond2) *
-                max_(
-                     plafond1 + af,
-                     br_pf  + new_af
-                     )
+                max_(plafond1 + af, br_pf + new_af)
                 ) +
             (br_pf > plafond2) *
             max_(
@@ -74,7 +67,6 @@ class allocations_familiales(formulas.SimpleFormulaColumn):
                 br_pf + new_af
                 )
             ) - br_pf
-        print ("modulation_af", modulation_af)
         return period, modulation_af
 
 
@@ -114,11 +106,10 @@ reform_legislation_subtree = {
             }
         }
     }
-# Build function
+
 
 def build_reform(tax_benefit_system):
     # Update legislation
-
     reference_legislation_json = tax_benefit_system.legislation_json
     reform_legislation_json = copy.deepcopy(reference_legislation_json)
     reform_legislation_json['children'].update(reform_legislation_subtree)
