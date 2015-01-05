@@ -31,10 +31,11 @@ from openfisca_france.tests import base
 
 
 def test_modulations_allocations_familiales_2gosses(age_parents = 40, age_enf1 = 9, age_enf2 = 9):
-    year = 2014
     reform = allocations_familiales_modulation.build_reform(base.tax_benefit_system)
     impact = 0
-    for i in [0, 1, 2, 3]:
+    first_year = 2014
+    child_birth_year = 2014
+    for year in range(first_year, 2019):
         scenario = reform.new_scenario().init_single_entity(
             axes = [
                 dict(
@@ -49,23 +50,24 @@ def test_modulations_allocations_familiales_2gosses(age_parents = 40, age_enf1 =
                     min = 0,
                     max = 200000,
     #                name = 'br_pf'
-                    name = 'sali'
+                    name = 'sal'
                     ),
                 ],
             period = year,
-            parent1 = dict(birth = datetime.date(year - 40, 1, 1)),
-            parent2 = dict(birth = datetime.date(year - 40, 1, 1)),
+            parent1 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
+            parent2 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
             enfants = [
-                dict(birth = datetime.date(year - age_enf1 + i, 1, 1)),
-                dict(birth = datetime.date(year - age_enf2 + i, 1, 1)),
+                dict(birth = datetime.date(child_birth_year - age_enf1, 1, 1)),
+                dict(birth = datetime.date(child_birth_year - age_enf2, 1, 1)),
                 ],
             )
         print("impact", impact)
         reference_simulation = scenario.new_simulation(debug = True, reference = True)
         print reference_simulation.calculate("af")
         reform_simulation = scenario.new_simulation(debug = True)
+        print reform_simulation.calculate("af")
 
-        impact = reform_simulation.calculate("allocations_familiales") + impact - reference_simulation.calculate("af")
+        impact += reform_simulation.calculate("allocations_familiales") - reference_simulation.calculate("af")
         #    print('reforme')
         print("final", reform_simulation.calculate("allocations_familiales"))
 

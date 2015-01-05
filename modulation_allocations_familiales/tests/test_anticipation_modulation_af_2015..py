@@ -28,15 +28,18 @@ import datetime
 from openfisca_core.tools import assert_near
 from openfisca_core import periods
 
-from modulation_allocations_familiales.reforms import prolongement_legislation_af_plaf_qf_2011
+from modulation_allocations_familiales.reforms import anticipation_modulation_af_2015
 from openfisca_france.tests import base
 
 
-def test_non_plaf_qf():
+def test_af():
     error_margin = 0.01
-    year = 2014
+    year = 2010
     period = periods.period("year", year, 10)
-    reform = prolongement_legislation_af_plaf_qf_2011.build_reform(base.tax_benefit_system)
+    test_year = 2015
+    test_period = periods.period("month", "{}-12".format(test_year))
+
+    reform = anticipation_modulation_af_2015.build_reform(base.tax_benefit_system)
     scenario = reform.new_scenario().init_single_entity(
         axes = [
             dict(
@@ -57,17 +60,12 @@ def test_non_plaf_qf():
 
     reference_simulation = scenario.new_simulation(debug = True, reference = True)
     reform_simulation = scenario.new_simulation(debug = True)
-    assert_near(
-        reference_simulation.calculate("avantage_qf", period = year)[0:4],
-        reform_simulation.calculate("avantage_qf", period = year)[0:4],
-        error_margin,
-        )
-    assert (reference_simulation.calculate("avantage_qf", period = year)[4:] == 3000).all()
-    assert (reform_simulation.calculate("avantage_qf", period = year)[6:] == 4672).all()
+    print reference_simulation.calculate("af", period = test_period).round()
+    print reform_simulation.calculate("af", period = test_period).round()
 
 
 if __name__ == '__main__':
     import logging
     import sys
     logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
-    test_non_plaf_qf()
+    test_af()

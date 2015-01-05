@@ -27,41 +27,57 @@ from __future__ import division
 
 import copy
 
-from openfisca_core import reforms
+from openfisca_core import periods, reforms
 from openfisca_france import entities
 
 # Reform legislation
 
 reform_legislation_subtree = {
-    "plafond_qf": {
+    "modulation": {
         "@type": "Node",
-        "description": "Plafonnement du quotient familial",
+        "description": "Modulation des allocations familiales en fonction des ressources",
         "children": {
-            "marpac": {
+            "plafond1": {
                 "@type": "Parameter",
-                "description": "Mariés ou PACS",
-                "format": "integer",
+                "description": "Plafond mensuel de ressources n°1",
+                "format": "float",
                 "unit": "currency",
                 "values": [
-                    {'start': u'2010-01-01', 'stop': u'2015-12-31', 'value': 2336}
+                    {'start': u'2015-01-01', 'stop': u'2015-12-31', 'value': 6000}
                     ],
                 },
-            "celib_enf": {
+            "plafond2": {
                 "@type": "Parameter",
-                "description": "Cas célibataires avec enfant(s)",
-                "format": "integer",
+                "description": "Plafond mensuel de ressources n°2",
+                "format": "float",
                 "unit": "currency",
                 "values": [
-                    {'start': u'2010-01-01', 'stop': u'2012-12-31', 'value': 4040},
-                    {'start': u'2013-01-01', 'stop': u'2014-12-31', 'value': 4040}
+                    {'start': u'2015-01-01', 'stop': u'2015-12-31', 'value': 8000}
                     ],
                 },
-            "veuf": {
+            "enfant_supp": {
                 "@type": "Parameter",
-                "description": "Veuf avec enfants à charge",
-                "format": "integer",
+                "description": "Majoration du plafond mensuel de ressources par enfant supplémentaire (à partir du 3e enfant)",
+                "format": "float",
+                "unit": "currency",
                 "values": [
-                    {'start': u'2010-01-01', 'stop': u'2014-12-31', 'value': 2236}
+                    {'start': u'2015-01-01', 'stop': u'2015-12-31', 'value': 500}
+                    ],
+                },
+            "taux1": {
+                "@type": "Parameter",
+                "description": "Taux de modulation au delà du plafond 1",
+                "format": "percent",
+                "values": [
+                    {'start': u'2015-01-01', 'stop': u'2015-12-31', 'value': .5}
+                    ],
+                },
+            "taux2": {
+                "@type": "Parameter",
+                "description": "Taux de modulation au delà du plafond 2",
+                "format": "percent",
+                "values": [
+                    {'start': u'2015-01-01', 'stop': u'2015-12-31', 'value': .25}
                     ],
                 },
             }
@@ -74,8 +90,8 @@ def build_reform(tax_benefit_system):
     # Update legislation
     reference_legislation_json = tax_benefit_system.legislation_json
     reform_legislation_json = copy.deepcopy(reference_legislation_json)
-    reform_legislation_json['children']['ir']['children']['plafond_qf']['children'].update(
-        reform_legislation_subtree['plafond_qf']['children'])
+    reform_legislation_json['children']['fam']['children']['af']['children'].update(
+        reform_legislation_subtree)
 
     # Update formulas
     reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
@@ -86,11 +102,14 @@ def build_reform(tax_benefit_system):
     # may be by creating the following functions
     # get_formulas(entity, variable, period), set_formulas(entity, variable, period)
     af_base = ReformFamilles.column_by_name['af_base']
-    del af_base.formula_class.dated_formulas_class[1]
-    af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
+    print af_base.formula_class.dated_formulas_class
+    af_base.formula_class.dated_formulas_class[1]['start_instant'] = periods.instant("2015-01-01")
+    af_base.formula_class.dated_formulas_class[0]['stop_instant'] = periods.instant("2014-12-31")
+    print af_base.formula_class.dated_formulas_class
+
 
     return reforms.Reform(
         legislation_json = reform_legislation_json,
-        name = u'prolongement législation af et plaf_qf depuis 2011',
+        name = u'anticipation modulation des af au 1er janvier 2015',
         reference = tax_benefit_system,
         )
