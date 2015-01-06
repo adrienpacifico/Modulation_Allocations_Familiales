@@ -107,8 +107,8 @@ def build_reform(tax_benefit_system):
     af_base.formula_class.dated_formulas_class[0]['stop_instant'] = periods.instant("2014-12-31")
     print af_base.formula_class.dated_formulas_class
 
-
     return reforms.Reform(
+        entity_class_by_key_plural = reform_entity_class_by_key_plural,
         legislation_json = reform_legislation_json,
         name = u'anticipation modulation des af au 1er janvier 2015',
         reference = tax_benefit_system,
