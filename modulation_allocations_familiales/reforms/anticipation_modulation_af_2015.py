@@ -26,9 +26,14 @@
 from __future__ import division
 
 import copy
+import datetime
 
-from openfisca_core import periods, reforms
+from openfisca_core import formulas, periods, reforms
 from openfisca_france import entities
+
+from openfisca_france.model import base
+from openfisca_france.model.prestations_familiales import af
+
 
 # Reform legislation
 
@@ -85,6 +90,14 @@ reform_legislation_subtree = {
     }
 
 
+class af_base(formulas.DatedFormulaColumn):
+    reference = af.af_base
+
+    @base.dated_function(start = datetime.date(2015, 1, 1), stop = None)
+    def function_20150101(self, simulation, period, reference = reference):
+        return reference.formula_class.at_instant(periods.instant("2015-01-01"))(
+            holder = self.holder).function(simulation, period)
+
 
 def build_reform(tax_benefit_system):
     # Update legislation
@@ -97,15 +110,7 @@ def build_reform(tax_benefit_system):
     reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
     ReformFamilles = reform_entity_class_by_key_plural['familles']
 
-    # Removing the formula starting in 2015-07-01
-    # TODO: improve because very dirty
-    # may be by creating the following functions
-    # get_formulas(entity, variable, period), set_formulas(entity, variable, period)
-    af_base = ReformFamilles.column_by_name['af_base']
-    print af_base.formula_class.dated_formulas_class
-    af_base.formula_class.dated_formulas_class[1]['start_instant'] = periods.instant("2015-01-01")
-    af_base.formula_class.dated_formulas_class[0]['stop_instant'] = periods.instant("2014-12-31")
-    print af_base.formula_class.dated_formulas_class
+    ReformFamilles.column_by_name['af_base'] = af_base
 
     return reforms.Reform(
         entity_class_by_key_plural = reform_entity_class_by_key_plural,

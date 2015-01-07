@@ -33,7 +33,6 @@ from openfisca_france.tests import base
 
 
 def test_af():
-    error_margin = 0.01
     year = 2010
     period = periods.period("year", year, 10)
     test_year = 2015
@@ -60,8 +59,9 @@ def test_af():
 
     reference_simulation = scenario.new_simulation(debug = True, reference = True)
     reform_simulation = scenario.new_simulation(debug = True)
-    print reference_simulation.calculate("af", period = test_period).round()
-    print reform_simulation.calculate("af", period = test_period).round()
+    assert (reference_simulation.calculate("af", period = test_period)[:8].round(2) == 194.98).all()
+    assert (reference_simulation.calculate("af", period = test_period)[-9:].round(2) == 97.49).all()
+    assert (reform_simulation.calculate("af", period = test_period).round(2) == 194.98).all()
 
 
 if __name__ == '__main__':
