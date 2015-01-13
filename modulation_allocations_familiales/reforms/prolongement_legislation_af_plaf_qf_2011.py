@@ -86,8 +86,9 @@ def build_reform(tax_benefit_system):
     # may be by creating the following functions
     # get_formulas(entity, variable, period), set_formulas(entity, variable, period)
     af_base = ReformFamilles.column_by_name['af_base']
-    del af_base.formula_class.dated_formulas_class[1]
-    af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
+    if len(af_base.formula_class.dated_formulas_class) > 1:
+        del af_base.formula_class.dated_formulas_class[1]
+        af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
 
     return reforms.Reform(
         entity_class_by_key_plural = reform_entity_class_by_key_plural,
