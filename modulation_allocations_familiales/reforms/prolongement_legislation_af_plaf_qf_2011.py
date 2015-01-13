@@ -90,6 +90,7 @@ def build_reform(tax_benefit_system):
         del af_base.formula_class.dated_formulas_class[1]
         af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
 
+
     return reforms.Reform(
         entity_class_by_key_plural = reform_entity_class_by_key_plural,
         legislation_json = reform_legislation_json,
