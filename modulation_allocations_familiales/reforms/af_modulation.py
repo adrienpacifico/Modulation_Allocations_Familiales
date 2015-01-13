@@ -118,7 +118,7 @@ def build_reform(tax_benefit_system):
 
     reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
     ReformFamilles = reform_entity_class_by_key_plural['familles']
-    ReformFamilles.column_by_name['allocations_familiales'] = allocations_familiales
+    ReformFamilles.column_by_name['af_modu_reform'] = allocations_familiales
 
     return reforms.Reform(
         entity_class_by_key_plural = reform_entity_class_by_key_plural,
