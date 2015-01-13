@@ -51,7 +51,7 @@ def benchmark_modu_af():
         enfants = enfants,
         period = periods.period('year', year),
     )
-#    print simulation.calculate('af_modu')
+#    print simulation.calculate('af_modu_reform')
     return scenario.new_simulation(debug = True)
 
 
@@ -72,65 +72,65 @@ def bechmark_plaf_qf():
 
 
 
-
-def benchmark_perte_af_plafqf(age_parents = 40, age_enf1 = 9, age_enf2 = 9):
-    reform1 = anticipation_modulation_af_2015.build_reform(base.tax_benefit_system)
-    reform2 = prolongement_legislation_af_plaf_qf_2011.build_reform(base.tax_benefit_system)
-    impact = 0
-    first_year = 2014
-    child_birth_year = 2014
-
-
-    count = 5
-    min = 0
-    max = 100000
-
-
-
-    for year in range(first_year, 2019):
-        scenario1 = reform1.new_scenario().init_single_entity(
-            axes = [
-                dict(
-                    count = count,
-                    min = min,
-                    max = max,
-                    name = 'sal'
-                    ),
-                ],
-            period = year,
-            parent1 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
-            parent2 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
-            enfants = [
-                dict(birth = datetime.date(child_birth_year - age_enf1, 1, 1)),
-                dict(birth = datetime.date(child_birth_year - age_enf2, 1, 1)),
-                ],
-            )
-        scenario2 = reform2.new_scenario().init_single_entity(
-            axes = [
-                dict(
-                    count = count,
-                    min = min,
-                    max = max,
-                    name = 'sal'
-                    ),
-                ],
-            period = year,
-            parent1 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
-            parent2 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
-            enfants = [
-                dict(birth = datetime.date(child_birth_year - age_enf1, 1, 1)),
-                dict(birth = datetime.date(child_birth_year - age_enf2, 1, 1)),
-                ],
-            )
-
-        reference_simulation = scenario1.new_simulation(debug = True, reference = True)
-        print reference_simulation.calculate("af")
-        reform_simulation = scenario2.new_simulation(debug = True)
-        print reform_simulation.calculate("af")
-
-        impact += reform_simulation.calculate("af") - reference_simulation.calculate("af")
-        #    print('reforme')
-    print("final", impact)
+#
+#def benchmark_perte_af_plafqf(age_parents = 40, age_enf1 = 9, age_enf2 = 9):
+#    reform1 = anticipation_modulation_af_2015.build_reform(base.tax_benefit_system)
+#    reform2 = prolongement_legislation_af_plaf_qf_2011.build_reform(base.tax_benefit_system)
+#    impact = 0
+#    first_year = 2014
+#    child_birth_year = 2014
+#
+#
+#    count = 5
+#    min = 0
+#    max = 100000
+#
+#
+#
+#    for year in range(first_year, 2019):
+#        scenario1 = reform1.new_scenario().init_single_entity(
+#            axes = [
+#                dict(
+#                    count = count,
+#                    min = min,
+#                    max = max,
+#                    name = 'sal'
+#                    ),
+#                ],
+#            period = year,
+#            parent1 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
+#            parent2 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
+#            enfants = [
+#                dict(birth = datetime.date(child_birth_year - age_enf1, 1, 1)),
+#                dict(birth = datetime.date(child_birth_year - age_enf2, 1, 1)),
+#                ],
+#            )
+#        scenario2 = reform2.new_scenario().init_single_entity(
+#            axes = [
+#                dict(
+#                    count = count,
+#                    min = min,
+#                    max = max,
+#                    name = 'sal'
+#                    ),
+#                ],
+#            period = year,
+#            parent1 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
+#            parent2 = dict(birth = datetime.date(first_year - age_parents , 1, 1)),
+#            enfants = [
+#                dict(birth = datetime.date(child_birth_year - age_enf1, 1, 1)),
+#                dict(birth = datetime.date(child_birth_year - age_enf2, 1, 1)),
+#                ],
+#            )
+#
+#        reference_simulation = scenario1.new_simulation(debug = True, reference = True)
+#        print reference_simulation.calculate("af")
+#        reform_simulation = scenario2.new_simulation(debug = True)
+#        print reform_simulation.calculate("af")
+#
+#        impact += reform_simulation.calculate("af") - reference_simulation.calculate("af")
+#        #    print('reforme')
+#    print("final", impact)
 
 
 def cas_type():
@@ -165,14 +165,14 @@ if __name__ == '__main__':
         )
     bareme = True
     benchmark1 = benchmark_modu_af()
-    print benchmark1.calculate('allocations_familiales')
+    print benchmark1.calculate('af_modu_reform')
 
     df = data_frame_from_decomposition_json(
         benchmark1,
         decomposition_json = None,
         remove_null = True)
-    print benchmark1.calculate('allocations_familiales')
-    df_modu = pd.DataFrame(benchmark1.calculate('allocations_familiales'))
+    print benchmark1.calculate('af_modu_reform')
+    df_modu = pd.DataFrame(benchmark1.calculate('af_modu_reform')).T
 
     df = pd.concat([df, df_modu])
     print df
