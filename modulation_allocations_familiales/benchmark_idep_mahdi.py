@@ -36,7 +36,8 @@ from modulation_allocations_familiales.reforms import prolongement_legislation_a
 from openfisca_france.tests import base
 
 
-def benchmark_modu_af():
+def benchmark_modu_af(axes = None, bareme = False, menage = None, parent1 = None, parent2 = None, enfants = None,
+                      period = None):
     reform_modu_af = af_modulation.build_reform(base.tax_benefit_system)
     scenario = reform_modu_af.new_scenario().init_single_entity(
         axes = axes if bareme else None,
@@ -44,13 +45,13 @@ def benchmark_modu_af():
         parent1 = parent1,
         parent2 = parent2,
         enfants = enfants,
-        period = periods.period('year', year),
-    )
-#    print simulation.calculate('af_modu_reform')
+        period = period,
+        )
     return scenario.new_simulation(debug = True)
 
 
-def bechmark_plaf_qf():
+def bechmark_plaf_qf(axes = None, bareme = False, menage = None, parent1 = None, parent2 = None, enfants = None,
+                     period = None):
     reform_plaf_qf = prolongement_legislation_af_plaf_qf_2011.build_reform(base.tax_benefit_system)
     scenario = reform_plaf_qf.new_scenario().init_single_entity(
         axes = axes if bareme else None,
@@ -58,66 +59,77 @@ def bechmark_plaf_qf():
         parent1 = parent1,
         parent2 = parent2,
         enfants = enfants,
-        period = periods.period('year', year),
-    )
-
+        period = period,
+        )
     return scenario.new_simulation(debug = True)
 
-
-def cas_type():
-    return False
-
-if __name__ == '__main__':
-    import logging
-    import sys
-    logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
-#    benchmark_perte_af_plafqf(40, 2, 2)
+def test():
     year = 2014
     axes = [
-            dict(
-                count = 20,
-                max = 200000,
-                min = 0,
-                name = 'salaire_de_base'
+        dict(
+            count = 20,
+            max = 200000,
+            min = 0,
+            name = 'salaire_de_base'
             ),
-    ]
+        ]
     parent1 = dict(birth = datetime.date(year - 40, 1, 1))
     parent2 = dict(birth = datetime.date(year - 40, 1, 1))
     enfants = [
         dict(birth = datetime.date(year - 9, 1, 1)),
         dict(birth = datetime.date(year - 9, 1, 1)),
-    ]
+        ]
     menage = dict(
         loyer = 1000,
         so = 4,
-    )
+        )
     bareme = True
+    period = "2013:5"  # periods.period('year', year - 2, 3),
 
-    benchmark1 = benchmark_modu_af()
-#    print benchmark1.calculate('af_modu_reform')
+    benchmark1 = benchmark_modu_af(
+        axes = axes,
+        bareme = bareme,
+        menage = menage,
+        parent1 = parent1,
+        parent2 = parent2,
+        enfants = enfants,
+        period = period,
+        )
 
     df = data_frame_from_decomposition_json(
         benchmark1,
         decomposition_json = None,
         remove_null = True)
-    print benchmark1.calculate('af')
-#    df_modu = pd.DataFrame(benchmark1.calculate('af_modu_reform')).T
-#    df = pd.concat([df, df_modu])
-#    print df
 
-    df.to_excel('IDEP.xlsx', sheet_name='modulation_af', engine='xlsxwriter')
+    print benchmark1.calculate('af', period = "2016")
+    print benchmark1.calculate('psoc', period = "2016")
+    print df
+    # df.to_excel('IDEP.xlsx', sheet_name='modulation_af', engine='xlsxwriter')
 
-#    print 'hello'
-#    print benchmark1.calculate('af')
-    benchmark2 = bechmark_plaf_qf()
+    benchmark2 = bechmark_plaf_qf(
+        axes = axes,
+        bareme = bareme,
+        menage = menage,
+        parent1 = parent1,
+        parent2 = parent2,
+        enfants = enfants,
+        period = period,
+        )
     df2 = data_frame_from_decomposition_json(
         benchmark2,
         decomposition_json = None,
         remove_null = True)
 
-    df2.to_excel('IDEP2.xlsx', sheet_name='plafqf2012', engine='xlsxwriter')
-    print benchmark2.calculate('af')
+    # df2.to_excel('IDEP2.xlsx', sheet_name='plafqf2012', engine='xlsxwriter')
+    print benchmark2.calculate('af', period = "2016")
+    return df, df2
 
+
+if __name__ == '__main__':
+    import logging
+    import sys
+    logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
+    df, df2 = test()
 
 
 

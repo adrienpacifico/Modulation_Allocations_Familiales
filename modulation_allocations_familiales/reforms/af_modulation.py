@@ -50,9 +50,7 @@ class allocations_familiales(formulas.SimpleFormulaColumn):
         af_nbenf = simulation.calculate('af_nbenf', period)
         br_pf = simulation.calculate('br_pf', period)
 
-
         af = af_majo + af_forf +af_base
-        print af
         plafond1 = params.plafond1 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
         plafond2 = params.plafond2 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
         new_af = (
