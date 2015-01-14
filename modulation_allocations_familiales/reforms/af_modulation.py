@@ -43,11 +43,16 @@ class allocations_familiales(formulas.SimpleFormulaColumn):
     def function(self, simulation, period):
         period = period.start.offset('first-of', 'month').period('month')
         params = simulation.legislation_at(period.start).modulation_alloc
-        af = simulation.calculate('af', period)
+
+        af_base = simulation.calculate('af_base', period)
+        af_forf = simulation.calculate('af_forf', period)
+        af_majo = simulation.calculate('af_majo', period)
         af_nbenf = simulation.calculate('af_nbenf', period)
         br_pf = simulation.calculate('br_pf', period)
 
-        af = simulation.calculate('af', period)
+
+        af = af_majo + af_forf +af_base
+        print af
         plafond1 = params.plafond1 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
         plafond2 = params.plafond2 + ((af_nbenf - 2) * 500) * (af_nbenf <= 2)
         new_af = (
@@ -118,7 +123,7 @@ def build_reform(tax_benefit_system):
 
     reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
     ReformFamilles = reform_entity_class_by_key_plural['familles']
-    ReformFamilles.column_by_name['af_modu_reform'] = allocations_familiales
+    ReformFamilles.column_by_name['af'] = allocations_familiales
 
     return reforms.Reform(
         entity_class_by_key_plural = reform_entity_class_by_key_plural,

@@ -28,15 +28,12 @@ import datetime
 
 from openfisca_matplotlib.dataframes import data_frame_from_decomposition_json
 
-from openfisca_core.tools import assert_near
 from openfisca_core import periods
 
 
 from modulation_allocations_familiales.reforms import af_modulation
 from modulation_allocations_familiales.reforms import prolongement_legislation_af_plaf_qf_2011
 from openfisca_france.tests import base
-
-
 
 import pandas as pd
 
@@ -64,8 +61,75 @@ def bechmark_plaf_qf():
         parent2 = parent2,
         enfants = enfants,
         period = periods.period('year', year),
-        )
+    )
     return scenario.new_simulation(debug = True)
+
+
+def cas_type():
+    return False
+
+if __name__ == '__main__':
+    import logging
+    import sys
+    logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
+#    benchmark_perte_af_plafqf(40, 2, 2)
+    year = 2014
+    axes = [
+            dict(
+                count = 20,
+                max = 200000,
+                min = 0,
+                name = 'salaire_de_base'
+            ),
+    ]
+    parent1 = dict(birth = datetime.date(year - 40, 1, 1))
+    parent2 = dict(birth = datetime.date(year - 40, 1, 1))
+    enfants = [
+        dict(birth = datetime.date(year - 9, 1, 1)),
+        dict(birth = datetime.date(year - 9, 1, 1)),
+    ]
+    menage = dict(
+        loyer = 1000,
+        so = 4,
+    )
+    bareme = True
+
+    benchmark1 = benchmark_modu_af()
+#    print benchmark1.calculate('af_modu_reform')
+
+    df = data_frame_from_decomposition_json(
+        benchmark1,
+        decomposition_json = None,
+        remove_null = True)
+    print benchmark1.calculate('af')
+#    df_modu = pd.DataFrame(benchmark1.calculate('af_modu_reform')).T
+#    df = pd.concat([df, df_modu])
+#    print df
+
+    df.to_excel('IDEP.xlsx', sheet_name='modulation_af', engine='xlsxwriter')
+
+#    print 'hello'
+#    print benchmark1.calculate('af')
+    benchmark2 = bechmark_plaf_qf()
+    df2 = data_frame_from_decomposition_json(
+        benchmark2,
+        decomposition_json = None,
+        remove_null = True)
+
+    df2.to_excel('IDEP2.xlsx', sheet_name='plafqf2012', engine='xlsxwriter')
+    print benchmark2.calculate('af')
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -131,54 +195,3 @@ def bechmark_plaf_qf():
 #        impact += reform_simulation.calculate("af") - reference_simulation.calculate("af")
 #        #    print('reforme')
 #    print("final", impact)
-
-
-def cas_type():
-    return False
-
-
-
-
-if __name__ == '__main__':
-    import logging
-    import sys
-    logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
-#    benchmark_perte_af_plafqf(40, 2, 2)
-    year = 2015
-    axes = [
-            dict(
-                count = 20,
-                max = 200000 * 10,
-                min = 0,
-                name = 'sal'
-                ),
-            ]
-    parent1 = dict(birth = datetime.date(year - 40, 1, 1))
-    parent2 = dict(birth = datetime.date(year - 40, 1, 1))
-    enfants = [
-        dict(birth = datetime.date(year - 9, 1, 1)),
-        dict(birth = datetime.date(year - 9, 1, 1)),
-        ]
-    menage = dict(
-        loyer = 1000000,
-        so = 4,
-        )
-    bareme = True
-    benchmark1 = benchmark_modu_af()
-    print benchmark1.calculate('af_modu_reform')
-
-    df = data_frame_from_decomposition_json(
-        benchmark1,
-        decomposition_json = None,
-        remove_null = True)
-    print benchmark1.calculate('af_modu_reform')
-    df_modu = pd.DataFrame(benchmark1.calculate('af_modu_reform')).T
-
-    df = pd.concat([df, df_modu])
-    print df
-    df.to_excel('IDEP.xlsx', sheet_name='Sheet1', engine='xlsxwriter')
-
-#    print benchmark1.calculate('af_modu_reforme')
-    print 'hello'
-    benchmark2 = bechmark_plaf_qf()
-    print benchmark2.calculate('af')
