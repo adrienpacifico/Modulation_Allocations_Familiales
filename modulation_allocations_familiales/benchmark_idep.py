@@ -25,6 +25,10 @@
 
 import datetime
 
+from PyQt4.Qt import QMainWindow, QApplication
+from openfisca_matplotlib.widgets.matplotlibwidget import MatplotlibWidget
+from openfisca_matplotlib.tests.test_graphs import ApplicationWindow
+from openfisca_matplotlib import graphs
 
 from openfisca_matplotlib.dataframes import data_frame_from_decomposition_json
 
@@ -64,8 +68,36 @@ def bechmark_plaf_qf():
     return scenario.new_simulation(debug = True)
 
 
-def cas_type():
-    return False
+
+
+
+
+def rates():
+    reference_simulation = benchmark1
+    app = QApplication(sys.argv)
+    win = ApplicationWindow()
+    axes = win.mplwidget.axes
+    graphs.draw_rates(
+        simulation = benchmark1,
+        axes = axes,
+        x_axis = 'salaire_de_base',
+        y_axis = 'revdisp',
+        reference_simulation = reference_simulation,
+        )
+    win.resize(1400, 700)
+    win.mplwidget.draw()
+    win.show()
+    sys.exit(app.exec_())
+
+
+
+
+
+
+
+
+#def cas_type(year = 2015, age_parents, nb_enf, age_enf1, age_enf2 ):
+#    return False
 
 if __name__ == '__main__':
     import logging
@@ -75,15 +107,17 @@ if __name__ == '__main__':
     year = 2014
     axes = [
             dict(
-                count = 20,
-                max = 200000,
-                min = 0,
+                count = 200,
+                max = 150000,
+                min = 40000,
+#                name = 'salaire_de_base'
                 name = 'salaire_de_base'
             ),
     ]
     parent1 = dict(birth = datetime.date(year - 40, 1, 1))
     parent2 = dict(birth = datetime.date(year - 40, 1, 1))
     enfants = [
+        dict(birth = datetime.date(year - 9, 1, 1)),
         dict(birth = datetime.date(year - 9, 1, 1)),
         dict(birth = datetime.date(year - 9, 1, 1)),
     ]
@@ -96,27 +130,42 @@ if __name__ == '__main__':
     benchmark1 = benchmark_modu_af()
 #    print benchmark1.calculate('af_modu_reform')
 
-    df = data_frame_from_decomposition_json(
-        benchmark1,
-        decomposition_json = None,
-        remove_null = True)
-    print benchmark1.calculate('af')
-#    df_modu = pd.DataFrame(benchmark1.calculate('af_modu_reform')).T
-#    df = pd.concat([df, df_modu])
-#    print df
-
-    df.to_excel('IDEP.xlsx', sheet_name='modulation_af', engine='xlsxwriter')
-
-#    print 'hello'
+#    df = data_frame_from_decomposition_json(
+#        benchmark1,
+#        decomposition_json = None,
+#        remove_null = True)
+#    print benchmark1.calculate('af')
+##    df_modu = pd.DataFrame(benchmark1.calculate('af_modu_reform')).T
+##    df = pd.concat([df, df_modu])
+##    print df
+#
+#    df.to_excel('IDEP.xlsx', sheet_name='modulation_af', engine='xlsxwriter')
+#
+##    print 'hello'
 #    print benchmark1.calculate('af')
     benchmark2 = bechmark_plaf_qf()
-    df2 = data_frame_from_decomposition_json(
-        benchmark2,
-        decomposition_json = None,
-        remove_null = True)
-
-    df2.to_excel('IDEP2.xlsx', sheet_name='plafqf2012', engine='xlsxwriter')
-    print benchmark2.calculate('af')
+#    df2 = data_frame_from_decomposition_json(
+#        benchmark2,
+#        decomposition_json = None,
+#        remove_null = True)
+#
+#    df2.to_excel('IDEP2.xlsx', sheet_name='plafqf2012', engine='xlsxwriter')
+#    print benchmark2.calculate('af')
+#    print "hello"
+#    period = periods.period('year', year)
+#
+#    df3 = df - df2
+#
+#    iloc1 = df.iloc[2]
+#    df3 = df3.append(iloc1, ignore_index=False)
+#    iloc2 = df.iloc[5]
+#    df3 = df3.append(iloc2, ignore_index=False)
+#
+##    revdisp_no_qf = df2.iloc[25]
+##    df3 = df3.append(revdisp_no_qf, ignore_index=False)
+#
+#    df3.to_excel('impact.xlsx', sheet_name='impact', engine='xlsxwriter')
+    rates()
 
 
 
