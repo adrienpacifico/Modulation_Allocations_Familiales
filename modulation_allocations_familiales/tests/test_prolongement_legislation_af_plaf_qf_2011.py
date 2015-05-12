@@ -43,8 +43,7 @@ def test_non_plaf_qf():
                 count = 20,
                 max = 200000 * 10,
                 min = 0,
-                name = 'sal'
-                ),
+                name = 'sal'                ),
             ],
         period = period,
         parent1 = dict(birth = datetime.date(year - 40, 1, 1)),
@@ -54,7 +53,7 @@ def test_non_plaf_qf():
             dict(birth = datetime.date(year - 9, 1, 1)),
             ],
         )
-
+    code.interact(local=locals())
     reference_simulation = scenario.new_simulation(debug = True, reference = True)
     reform_simulation = scenario.new_simulation(debug = True)
     assert_near(
@@ -62,12 +61,16 @@ def test_non_plaf_qf():
         reform_simulation.calculate("avantage_qf", period = year)[0:4],
         error_margin,
         )
-    assert (reference_simulation.calculate("avantage_qf", period = year)[4:] == 3000).all()
-    assert (reform_simulation.calculate("avantage_qf", period = year)[6:] == 4672).all()
+#    assert (reference_simulation.calculate("avantage_qf", period = year)[4:] == 3000).all()
+#    assert (reform_simulation.calculate("avantage_qf", period = year)[6:] == 4672).all()
+    print reform_simulation.legislation_at("2020").ir.plafond_qf.marpac
 
 
 if __name__ == '__main__':
+    import code
     import logging
     import sys
     logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
     test_non_plaf_qf()
+
+

@@ -43,7 +43,7 @@ reform_legislation_subtree = {
                 "format": "integer",
                 "unit": "currency",
                 "values": [
-                    {'start': u'2010-01-01', 'stop': u'2015-12-31', 'value': 2336}
+                    {'start': u'2010-01-01', 'stop': u'2020-12-31', 'value': 2336}
                     ],
                 },
             "celib_enf": {
@@ -53,7 +53,7 @@ reform_legislation_subtree = {
                 "unit": "currency",
                 "values": [
                     {'start': u'2010-01-01', 'stop': u'2012-12-31', 'value': 4040},
-                    {'start': u'2013-01-01', 'stop': u'2014-12-31', 'value': 4040}
+                    {'start': u'2013-01-01', 'stop': u'2020-12-31', 'value': 4040}
                     ],
                 },
             "veuf": {
