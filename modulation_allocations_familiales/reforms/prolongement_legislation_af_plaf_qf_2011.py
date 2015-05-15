@@ -77,22 +77,21 @@ def build_reform(tax_benefit_system):
     reform_legislation_json['children']['ir']['children']['plafond_qf']['children'].update(
         reform_legislation_subtree['plafond_qf']['children'])
 
-    # Update formulas
-    reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
-    ReformFamilles = reform_entity_class_by_key_plural['familles']
+
 
     # Removing the formula starting in 2015-07-01
     # TODO: improve because very dirty
     # may be by creating the following functions
     # get_formulas(entity, variable, period), set_formulas(entity, variable, period)
-    af_base = ReformFamilles.column_by_name['af_base']
-    if len(af_base.formula_class.dated_formulas_class) > 1:
-        del af_base.formula_class.dated_formulas_class[1]
-        af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
 
-    return reforms.Reform(
-        entity_class_by_key_plural = reform_entity_class_by_key_plural,
+    
+    Reform = reforms.make_reform(
         legislation_json = reform_legislation_json,
-        name = u'prolongement législation af et plaf_qf depuis 2011',
+        name = u'prolongement legislation af',
         reference = tax_benefit_system,
         )
+#    af_base = Reform.column_by_name['af_base']
+#    if len(af_base.formula_class.dated_formulas_class) > 1:
+#        del af_base.formula_class.dated_formulas_class[1]
+#        af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
+    return Reform()

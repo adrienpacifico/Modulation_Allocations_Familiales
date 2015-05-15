@@ -100,7 +100,7 @@ def test(nb_enf = 2, age_enf = 0):
     enfants = [dict(birth = datetime.date(start_year - age_enf, 1, 1))] * nb_enf
     menage = dict(
         loyer = 1000,
-        so = 4,
+   #     so = 4,
         )
     bareme = True
     period = "{}:{}".format(fill_year, number_of_years + (start_year - fill_year))
@@ -125,16 +125,8 @@ def test(nb_enf = 2, age_enf = 0):
         period = period,
         )
 
-    simulation_modu_juillet = simul_modu_juillet(
-        axes = axes,
-        bareme = bareme,
-        menage = menage,
-        parent1 = parent1,
-        parent2 = parent2,
-        enfants = enfants,
-        period = period,
-        )
-    return benchmark1, benchmark2, simulation_modu_juillet
+
+    return benchmark1, benchmark2
 
 
 
@@ -144,7 +136,7 @@ def dataframe_result(nb_enf = 5, nb_year_of_simulation = 20, age_enf = 6):
 
     tps1 = time.clock()
 
-    benchmark1, benchmark2, simulation_modu_juillet = test(nb_enf = nb_enf, age_enf = age_enf)
+    benchmark1, benchmark2 = test(nb_enf = nb_enf, age_enf = age_enf)
     life_cycle_impact = pd.DataFrame
 #    etape1 = tps1 - time.clock()
 

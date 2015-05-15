@@ -128,13 +128,20 @@ def build_reform(tax_benefit_system):
 
     # Update formulas
 
-    reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
-    ReformFamilles = reform_entity_class_by_key_plural['familles']
-    ReformFamilles.column_by_name['af'] = allocations_familiales
+#    reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
+#    ReformFamilles = reform_entity_class_by_key_plural['familles']
+#    ReformFamilles.column_by_name['af'] = allocations_familiales
+#
+#    return reforms.Reform(
+#        entity_class_by_key_plural = reform_entity_class_by_key_plural,
+#        legislation_json = reform_legislation_json,
+#        name = u'Modulations 2014',
+#        reference = tax_benefit_system,
+#        )
 
-    return reforms.Reform(
-        entity_class_by_key_plural = reform_entity_class_by_key_plural,
+    Reform = reforms.make_reform(
         legislation_json = reform_legislation_json,
-        name = u'Modulations 2014',
+        name = u'Allocations familiales modulees',
         reference = tax_benefit_system,
         )
+    return Reform()
