@@ -46,24 +46,6 @@ reform_legislation_subtree = {
                     {'start': u'2010-01-01', 'stop': u'2020-12-31', 'value': 10000000000000000000}
                     ],
                 },
-            "celib_enf": {
-                "@type": "Parameter",
-                "description": "Cas célibataires avec enfant(s)",
-                "format": "integer",
-                "unit": "currency",
-                "values": [
-                    {'start': u'2010-01-01', 'stop': u'2012-12-31', 'value': 4040},
-                    {'start': u'2013-01-01', 'stop': u'2020-12-31', 'value': 4040}
-                    ],
-                },
-            "veuf": {
-                "@type": "Parameter",
-                "description": "Veuf avec enfants à charge",
-                "format": "integer",
-                "values": [
-                    {'start': u'2010-01-01', 'stop': u'2014-12-31', 'value': 2236}
-                    ],
-                },
             }
         }
     }
@@ -72,27 +54,14 @@ reform_legislation_subtree = {
 
 def build_reform(tax_benefit_system):
     # Update legislation
-    reference_legislation_json = tax_benefit_system.legislation_json
-    reform_legislation_json = copy.deepcopy(reference_legislation_json)
+    reform_legislation_json = copy.deepcopy(tax_benefit_system.legislation_json)
     reform_legislation_json['children']['ir']['children']['plafond_qf']['children'].update(
         reform_legislation_subtree['plafond_qf']['children'])
 
-    # Update formulas
-    reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
-    ReformFamilles = reform_entity_class_by_key_plural['familles']
-
-    # Removing the formula starting in 2015-07-01
-    # TODO: improve because very dirty
-    # may be by creating the following functions
-    # get_formulas(entity, variable, period), set_formulas(entity, variable, period)
-    af_base = ReformFamilles.column_by_name['af_base']
-    if len(af_base.formula_class.dated_formulas_class) > 1:
-        del af_base.formula_class.dated_formulas_class[1]
-        af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
-
-    return reforms.Reform(
-        entity_class_by_key_plural = reform_entity_class_by_key_plural,
+    Reform = reforms.make_reform(
         legislation_json = reform_legislation_json,
-        name = u'prolongement législation af et plaf_qf depuis 2011',
+        name = u"Supprime le plafond du quotient familial",
         reference = tax_benefit_system,
         )
+
+    return Reform()

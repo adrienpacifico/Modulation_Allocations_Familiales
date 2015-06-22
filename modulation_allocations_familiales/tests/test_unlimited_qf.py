@@ -34,8 +34,8 @@ from openfisca_france.tests import base
 
 def test_non_plaf_qf():
     error_margin = 0.01
-    year = 2014
-    period = periods.period("year", year, 10)
+    year = 2020
+    period = periods.period("year", year)
     reform = unlimited_qf.build_reform(base.tax_benefit_system)
     scenario = reform.new_scenario().init_single_entity(
         axes = [
@@ -43,7 +43,7 @@ def test_non_plaf_qf():
                 count = 20,
                 max = 200000 * 10,
                 min = 0,
-                name = 'sal'
+                name = 'sali',
                 ),
             ],
         period = period,
@@ -63,7 +63,7 @@ def test_non_plaf_qf():
         )
 #    assert (reference_simulation.calculate("avantage_qf", period = year)[4:] == 3000).all()
 #    assert (reform_simulation.calculate("avantage_qf", period = year)[6:] == 4672).all()
-    print reform_simulation.legislation_at("2020").ir.plafond_qf.marpac
+    print 'plafondqf = ', reform_simulation.legislation_at(periods.instant('2020')).ir.plafond_qf.marpac
 
 
 
