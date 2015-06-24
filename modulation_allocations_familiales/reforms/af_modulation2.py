@@ -28,49 +28,14 @@ from __future__ import division
 import copy
 
 from numpy import maximum as max_
-from openfisca_core import columns, formulas, reforms
+from openfisca_core import columns, formulas, periods, reforms
 
-from openfisca_france import entities
+from openfisca_france import entities, model
 
 
 # Reform formulas
 
-class allocations_familiales(formulas.SimpleFormulaColumn):
-    column = columns.FloatCol
-    entity_class = entities.Familles
-    label = u"Modulation ddes allocations familiales (issu PLFSS2015)"
 
-    def function(self, simulation, period):
-        period = period.start.offset('first-of', 'month').period('month')
-        params = simulation.legislation_at(period.start).modulation_alloc
-
-        af_base = simulation.calculate('af_base', period)
-        af_forf = simulation.calculate('af_forf', period)
-        af_majo = simulation.calculate('af_majo', period)
-        af_nbenf = simulation.calculate('af_nbenf', period)
-        br_pf = simulation.calculate('br_pf', period)
-
-        af = af_majo + af_forf +af_base
-        plafond1 = params.plafond1 + ((af_nbenf - 2) * 500) * (af_nbenf >= 2)
-        plafond2 = params.plafond2 + ((af_nbenf - 2) * 500) * (af_nbenf >= 2)
-        new_af = (
-            (br_pf <= plafond1) * af +
-            (br_pf > plafond1) * (br_pf < plafond2) * af / params.diviseur_plafond_1 +
-            (br_pf > plafond2) * af / params.diviseur_plafond_2
-            )
-
-        modulation_af = (
-            (br_pf <= plafond1) * (af + br_pf) + (
-                (br_pf > plafond1) * (br_pf <= plafond2) *
-                max_(plafond1 + af, br_pf + new_af)
-                ) +
-            (br_pf > plafond2) *
-            max_(
-                af / params.diviseur_plafond_1 + plafond2,
-                br_pf + new_af
-                )
-            ) - br_pf
-        return period, modulation_af
 
 
 # Reform legislation
@@ -98,16 +63,16 @@ reform_legislation_subtree = {
                 "@type": "Parameter",
                 "description": "coefficient après les pallier 1 des allocations familiales",
                 "format": "integer",
-                "values": [ {'start': u'2004-01-01', 'stop': u'2014-12-31', 'value': 1},
-                            {'start': u'2015-01-01', 'stop': u'2015-12-31', 'value': 2},
+                "values": [ {'start': u'2004-01-01', 'stop': u'2015-06-31', 'value': 1},
+                            {'start': u'2015-07-01', 'stop': u'2015-12-31', 'value': 2},
                 ],
                 },
             "diviseur_plafond_2": {
                 "@type": "Parameter",
                 "description": "coefficient après les pallier 2 des allocations familiales",
                 "format": "integer",
-                "values": [ {'start': u'2004-01-01', 'stop': u'2014-12-31', 'value': 1},
-                            {'start': u'2015-01-01', 'stop': u'2015-12-31', 'value': 4},
+                "values": [ {'start': u'2004-01-01', 'stop': u'2015-06-31', 'value': 1},
+                            {'start': u'2015-01-01', 'stop': u'2015-07-01', 'value': 4},
                 ],
                 },
             }
@@ -115,21 +80,55 @@ reform_legislation_subtree = {
     }
 
 
+
+    
+
 def build_reform(tax_benefit_system):
     # Update legislation
-    reference_legislation_json = tax_benefit_system.legislation_json
-    reform_legislation_json = copy.deepcopy(reference_legislation_json)
+    reform_legislation_json = copy.deepcopy(tax_benefit_system.legislation_json)
     reform_legislation_json['children'].update(reform_legislation_subtree)
-
-    # Update formulas
-
-    reform_entity_class_by_key_plural = reforms.clone_entity_classes(entities.entity_class_by_key_plural)
-    ReformFamilles = reform_entity_class_by_key_plural['familles']
-    ReformFamilles.column_by_name['af'] = allocations_familiales
-
-    return reforms.Reform(
-        entity_class_by_key_plural = reform_entity_class_by_key_plural,
+    
+    Reform = reforms.make_reform(
         legislation_json = reform_legislation_json,
-        name = u'Modulations 2014',
+        name = u"Supprime le plafond du quotient familial",
         reference = tax_benefit_system,
         )
+
+    @Reform.formula
+    class af(formulas.SimpleFormulaColumn):
+        reference = model.prestations.prestations_familiales.af.af
+        label = u"Modulation des allocations familiales (issu PLFSS2015)"
+
+        def function(self, simulation, period):
+            period = period.start.offset('first-of', 'month').period('month')
+            params = simulation.legislation_at(period.start).modulation_alloc
+        
+            af_base = simulation.calculate('af_base', period)
+            af_forf = simulation.calculate('af_forf', period)
+            af_majo = simulation.calculate('af_majo', period)
+            af_nbenf = simulation.calculate('af_nbenf', period)
+            br_pf = simulation.calculate('br_pf', period)
+        
+            af = af_majo + af_forf +af_base
+            plafond1 = params.plafond1 + ((af_nbenf - 2) * 500) * (af_nbenf >= 2)
+            plafond2 = params.plafond2 + ((af_nbenf - 2) * 500) * (af_nbenf >= 2)
+            new_af = (
+                (br_pf <= plafond1) * af +
+                (br_pf > plafond1) * (br_pf < plafond2) * af / params.diviseur_plafond_1 +
+                (br_pf > plafond2) * af / params.diviseur_plafond_2
+                )
+        
+            modulation_af = (
+                (br_pf <= plafond1) * (af + br_pf) + (
+                    (br_pf > plafond1) * (br_pf <= plafond2) *
+                    max_(plafond1 + af, br_pf + new_af)
+                    ) +
+                (br_pf > plafond2) *
+                max_(
+                    af / params.diviseur_plafond_1 + plafond2,
+                    br_pf + new_af
+                    )
+                ) - br_pf
+            return period, modulation_af
+
+    return Reform()
