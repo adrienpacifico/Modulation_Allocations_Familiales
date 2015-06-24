@@ -26,44 +26,47 @@
 import datetime
 
 from openfisca_core.tools import assert_near
-from openfisca_core import periods
+from openfisca_core import periods, web_tools
 
 from modulation_allocations_familiales.reforms import prolongement_legislation_af_plaf_qf_2011
 from openfisca_france.tests import base
 
 
-def test_non_plaf_qf():
+def test_prolongement_legislation_af_plaf_qf_2011():
     error_margin = 0.01
-    year = 2014
-    period = periods.period("year", year, 10)
+    year = 2018
+    period = periods.period("year", year)
     reform = prolongement_legislation_af_plaf_qf_2011.build_reform(base.tax_benefit_system)
     scenario = reform.new_scenario().init_single_entity(
         axes = [
             dict(
-                count = 20,
-                max = 200000 * 10,
-                min = 0,
-                name = 'sal'                ),
+                count = 40,
+                min = 2000*12,
+                max = 15000*12,
+                name = 'salaire_de_base',
+                ),
             ],
         period = period,
         parent1 = dict(birth = datetime.date(year - 40, 1, 1)),
         parent2 = dict(birth = datetime.date(year - 40, 1, 1)),
         enfants = [
-            dict(birth = datetime.date(year - 9, 1, 1)),
-            dict(birth = datetime.date(year - 9, 1, 1)),
+            dict(birth = datetime.date(year - 1, 1, 1)),
+ #           dict(birth = datetime.date(year - 9, 1, 1)),
             ],
+        menage = dict(statut_occupation = 4,
+                  loyer = 1000,)
         )
-    code.interact(local=locals())
+ #   code.interact(local=locals())
     reference_simulation = scenario.new_simulation(debug = True, reference = True)
     reform_simulation = scenario.new_simulation(debug = True)
-    assert_near(
-        reference_simulation.calculate("avantage_qf", period = year)[0:4],
-        reform_simulation.calculate("avantage_qf", period = year)[0:4],
-        error_margin,
-        )
-#    assert (reference_simulation.calculate("avantage_qf", period = year)[4:] == 3000).all()
-#    assert (reform_simulation.calculate("avantage_qf", period = year)[6:] == 4672).all()
-    print reform_simulation.legislation_at("2020").ir.plafond_qf.marpac
+
+    print "le plafonde qf est de {} en {}".format(reform_simulation.legislation_at(periods.instant( year)).ir.plafond_qf.marpac,
+                                                    year)
+#    web_tools.open_trace_tool(scenario, ["rsa"])
+ 
+    assert (reference_simulation.calculate("avantage_qf", period = year) <= reform_simulation.calculate("avantage_qf", period = year)).all
+    assert (reference_simulation.calculate("avantage_qf", period = year)[-5::] < reform_simulation.calculate("avantage_qf", period = year)[-5::]).all
+
 
 
 if __name__ == '__main__':
@@ -71,6 +74,6 @@ if __name__ == '__main__':
     import logging
     import sys
     logging.basicConfig(level = logging.ERROR, stream = sys.stdout)
-    test_non_plaf_qf()
-
+    test_prolongement_legislation_af_plaf_qf_2011()
+#TODO : demander a manu pourquoi webtools marche bien mais les prints des calculate ne renvoient pas les bons résultats ?
 
