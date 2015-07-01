@@ -62,7 +62,7 @@ def test_prolongement_legislation_af_plaf_qf_2011():
 
     print "le plafonde qf est de {} en {}".format(reform_simulation.legislation_at(periods.instant( year)).ir.plafond_qf.marpac,
                                                     year)
-#    web_tools.open_trace_tool(scenario, ["rsa"])
+#    web_tools.open_trace_tool(scenario, ["revenu_disponible"])
  
     assert (reference_simulation.calculate("avantage_qf", period = year) <= reform_simulation.calculate("avantage_qf", period = year)).all
     assert (reference_simulation.calculate("avantage_qf", period = year)[-5::] < reform_simulation.calculate("avantage_qf", period = year)[-5::]).all

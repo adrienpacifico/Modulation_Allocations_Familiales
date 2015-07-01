@@ -50,14 +50,14 @@ reform_legislation_subtree = {
                 "description": "Montant plafond1 des allocations familales",
                 "format": "integer",
                 "unit": "currency",
-                "values": [{'start': u'2004-01-01', 'stop': u'2014-12-31', 'value':55950/12}],
+                "values": [{'start': u'2004-01-01', 'stop': u'2014-12-31', 'value':55950}],
                 },
             "plafond2": {
                 "@type": "Parameter",
                 "description": "Montant plafond2 des alocations familiales",
                 "format": "integer",
                 "unit": "currency",
-                "values": [{'start': u'2004-01-01', 'stop': u'2014-12-31', 'value': 78300/12}],
+                "values": [{'start': u'2004-01-01', 'stop': u'2014-12-31', 'value': 78300}],
                 },
             "diviseur_plafond_1": {
                 "@type": "Parameter",
@@ -110,8 +110,8 @@ def build_reform(tax_benefit_system):
             br_pf = simulation.calculate('br_pf', period)
         
             af = af_majo + af_forf +af_base
-            plafond1 = params.plafond1 + ((af_nbenf - 2) * 5595/12) * (af_nbenf >= 2)
-            plafond2 = params.plafond2 + ((af_nbenf - 2) * 5595/12) * (af_nbenf >= 2)
+            plafond1 = params.plafond1 + ((af_nbenf - 2) * 5595) * (af_nbenf >= 2)
+            plafond2 = params.plafond2 + ((af_nbenf - 2) * 5595) * (af_nbenf >= 2)
             new_af = (
                 (br_pf <= plafond1) * af +
                 (br_pf > plafond1) * (br_pf < plafond2) * af / params.diviseur_plafond_1 +
