@@ -28,8 +28,9 @@ import datetime
 
 from openfisca_core import periods
 from openfisca_core.tools import assert_near
-from openfisca_france.reforms import plaf_qf_2012_sans_modulation_af
 from openfisca_france.tests import base
+
+from ..reforms import plaf_qf_2012_sans_modulation_af
 
 
 def test_plaf_qf_2012_sans_modulation_af():
