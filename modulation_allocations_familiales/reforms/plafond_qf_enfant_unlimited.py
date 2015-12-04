@@ -2,17 +2,11 @@
 
 from __future__ import division
 
-import copy
-from openfisca_core.columns import FloatCol
-from openfisca_core import reforms, columns
-from openfisca_core.formulas import dated_function, DatedFormulaColumn
-from openfisca_france.entities import Familles
-from openfisca_france.tests import base
-
-from datetime import date
+from openfisca_core import reforms
 
 
-#TODO : actualise parameters with respect to inflation
+# TODO : actualise parameters with respect to inflation
+
 
 def build_reform(tax_benefit_system):
     # Removing the formula starting in 2015-07-01
