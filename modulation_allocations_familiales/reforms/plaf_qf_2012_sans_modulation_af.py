@@ -5,7 +5,7 @@ from __future__ import division
 import copy
 from openfisca_core.columns import FloatCol
 from openfisca_core import reforms, columns
-from openfisca_core.formulas import dated_function, DatedFormulaColumn
+from openfisca_core.formulas import dated_function, DatedVariable
 from openfisca_france.entities import Familles
 from openfisca_france.tests import base
 
@@ -31,8 +31,8 @@ def build_reform(tax_benefit_system):
 #        del af_base.formula_class.dated_formulas_class[1]
 #        af_base.formula_class.dated_formulas_class[0]['stop_instant'] = None
 
-#    @Reform.formula
-#    class af_taux_modulation(formulas.DatedFormulaColumn):
+
+#    class af_taux_modulation(formulas.DatedVariable):
 #        column = columns.FloatCol
 #        entity_class = Familles
 #        label = u"Taux de modulation à appliquer au montant des AF depuis 2015"
@@ -61,8 +61,8 @@ def build_reform(tax_benefit_system):
 #
 #            return period, taux
 #
-#    @Reform.formula
-#    class af_complement_degressif(DatedFormulaColumn):
+
+#    class af_complement_degressif(DatedVariable):
 #        column = FloatCol
 #        entity_class = Familles
 #        label = u"AF - Complément dégressif en cas de dépassement du plafond"
@@ -93,8 +93,7 @@ def build_reform(tax_benefit_system):
 
 ####################
 ####################
-    @Reform.formula
-    class af_taux_modulation(DatedFormulaColumn):
+    class af_taux_modulation(DatedVariable):
         column = FloatCol
         entity_class = Familles
         label = u"Taux de modulation à appliquer au montant des AF depuis 2015"
@@ -124,8 +123,7 @@ def build_reform(tax_benefit_system):
             return period, taux
 
 
-    @Reform.formula
-    class af_forf_taux_modulation(DatedFormulaColumn):
+    class af_forf_taux_modulation(DatedVariable):
         column = FloatCol
         entity_class = Familles
         label = u"Taux de modulation à appliquer à l'allocation forfaitaire des AF depuis 2015"
@@ -156,8 +154,8 @@ def build_reform(tax_benefit_system):
 
             return period, taux
 
-    @Reform.formula
-    class af_complement_degressif(DatedFormulaColumn):
+
+    class af_complement_degressif(DatedVariable):
         column = FloatCol
         entity_class = Familles
         label = u"AF - Complément dégressif en cas de dépassement du plafond"
@@ -186,8 +184,7 @@ def build_reform(tax_benefit_system):
             return period, max_(0, af - depassement_mensuel) * (depassement_mensuel > 0)
 
 
-    @Reform.formula
-    class af_forf_complement_degressif(DatedFormulaColumn):
+    class af_forf_complement_degressif(DatedVariable):
         column = FloatCol
         entity_class = Familles
         label = u"AF - Complément dégressif pour l'allocation forfaitaire en cas de dépassement du plafond"
